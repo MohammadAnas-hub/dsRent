@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-&na#r3g-4k$&w0*l7at&gez(kc@23jp7o+j-!)gy_)ln1*vq&%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.yourdomain.com']
 
 
 # Application definition
@@ -77,8 +77,12 @@ WSGI_APPLICATION = 'dsRent.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ds1',
+        'USER': 'root',
+        'PASSWORD': 'asdf;lkj1',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
