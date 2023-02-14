@@ -5,127 +5,103 @@ from django.utils import timezone
 # Create your models here.
 class UserModel(models.Model):
     userId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    username = models.CharField(max_length=50, unique=True)
     firstName = models.CharField(max_length=100)
     lastName = models.CharField(max_length=100)
     password = models.CharField(max_length=250)   #while taking it as an input in forms we will use PasswordInput on form
     phone = models.BigIntegerField(blank=False, null=False, unique=True)
     email = models.EmailField(blank=False, unique=True)
     userImg = models.ImageField(upload_to='accounts/images', null=True, blank=True)
-    userType = models.CharField(max_length=50)
-    desc = models.TextField(null=True)
-    verified = models.BooleanField(default=False)
-    online = models.BooleanField(default=False)
+    licenseNumber = models.CharField(max_length=20)
+    dob = models.DateTimeField()
+    city = models.CharField(max_length=40)
+    # userType = models.CharField(max_length=50)
+    # desc = models.TextField(null=True)
+    # verified = models.BooleanField(default=False)
+    # online = models.BooleanField(default=False)
 
     def __str__(self):
         return self.email
 
 
 class ForgetPassword(models.Model):
-    user = models.ForeignKey('UserModell', related_name='userforgetpassword', on_delete=models.CASCADE)
+    user = models.ForeignKey('UserModel', related_name='userforgetpassword', on_delete=models.CASCADE)
     token = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return self.token
 
-class Category(models.Model):
-    category_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    categoryName = models.CharField(max_length=50)
+class Service(models.Model):
+    serviceId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    serviceName = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.categoryName
+        return self.serviceName
 
-# class HourleyService(models.Model):
-#     hourleyService_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     city = models.CharField()
-#     pickUpPoint = models.CharField()
-#     dropOfCity = models.CharField()
-#     dropOfPoint = models.CharField(blank=True)
-#     datetime = models.DateTimeField(default=timezone.now)
-#     noOfHours = models.IntegerField()
-#     noOfGuests = models.IntegerField(blank=True)
-#     noOfLuggage = models.IntegerField(blank=True)
+class SubServices(models.Model):
+    subServiceId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    subServiceName = models.CharField(max_length=50)
+    parentService = models.ForeignKey('Service', related_name='parentService', on_delete=models.CASCADE)
 
-#     def __str__(self):
-#         return self.
+    def __str__(self):
+        return self.subServiceName
 
-# class CityToCityTrip(models.Model):
-#     cityToCityTrip = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     city = models.CharField()
-#     pickUpPoint = models.CharField()
-#     dropOfCity = models.CharField()
-#     dropOfPoint = models.CharField(blank=True)
-#     datetime = models.DateTimeField(default=timezone.now)
-#     noOfGuests = models.IntegerField(blank=True)
-#     noOfLuggage = models.IntegerField(blank=True)
-
-#     # def __str__(self):
-#     #     return self.
-
-# class LimousineService(models.Model):
-#     hourleyService = models.ForeignKey('HourleyService', related_name="hourleySerive", on_delete=models.CASCADE, null=True)
-#     cityToCityTrip = 
 
 class VehicleDetails(models.Model):
     vehicleDetailsID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    driver = models.ForeignKey('UserModel', related_name='driver', on_delete=models.CASCADE)
-    vehicleCategory = models.CharField(max_length=50)
+    vehChoices = (('Sedan', 'Sedan'),
+                   ('SUV', 'SUV'),
+                   ('Van', 'Van'),
+                   ('Luxury', 'Luxury'),
+                   ('Bus', 'Bus'))
+    vehicleCategory = models.CharField(max_length=20, choices=vehChoices)
     vehicleBrand = models.CharField(max_length=30)
     vehicleModel = models.CharField(max_length=30)
     vehicleModelYear = models.IntegerField()
     vehiclePlateNo = models.CharField(max_length=30)
-    assigned = models.BooleanField(default=False)
+    corrServiceId = models.ForeignKey('Service', related_name='corrServiceId', on_delete=models.CASCADE)
+    city = models.CharField(max_length=40)
+    # branchId -----------------------------------------(foreign key)
+    vehiclephoto = models.ImageField(upload_to='accounts/images', null=True, blank=True)
+    document = models.ImageField(upload_to='accounts/images', null=True, blank=True)
+    # driver = models.ForeignKey('Driver', related_name='driver', on_delete=models.CASCADE)
+    totalBookings = models.IntegerField(default=0)
+    vehicleColor = models.CharField(max_length=30, blank=True)
+    seatCapacity = models.IntegerField()
 
-    def nowAssigned(self):
-        self.assigned = True
+
+
+
+    # what to do with this
+
+    # assigned = models.BooleanField(default=False)
+    # def nowAssigned(self):
+    #     self.assigned = True
 
     def __str__(self):
         return self.vehicleCategory
 
-class Trips(models.Model):
-    tripsId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    serviceType = models.ForeignKey('LimousineService',related_name="serviceType", on_delete=models.CASCADE)
-    tripChoices = (('ScheduleTrips', 'ScheduleTrips'),
-                   ('FinishedTrips', 'FinishedTrips'),
-                   ('OngoingTrips', 'OngoingTrips'),
-                   ('CanceledTrips', 'CanceledTrips'))
-    tripCate = models.CharField(max_length=20, choices=tripChoices)
 
-    startingTime = None
-    guestPickedUp = models.BooleanField(default=False)
-    endTime = None
-    
-    def tripStarted(self):
-        self.startingTime = models.DateTimeField(default=timezone.now)
-
-    def guestPickedUpFunc(self):
-        self.guestPickedUp = True
-
-    def tripEnded(self):
-        self.endTime = models.DateTimeField(default=timezone.now)
-
-    
-    def __str__(self):
-        return self.tripCate
-
-
-class LimousineService(models.Model):
-    limousineServiceId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    pickUpCity = models.CharField(max_length=50)
-    pickupLocation = models.CharField(max_length=100)
-    destinationCity = models.CharField(max_length=50)
-    destinationLocation = models.CharField(max_length=100)
-    pickupDateTime = models.DateTimeField(default=timezone.now)
-    noOfHours = models.IntegerField()
-    noOfGuests = models.IntegerField(blank=True)
-    noOfLuggage = models.IntegerField(blank=True)
-
-    limoChoices = (('HourlyService', 'HourlyService'),
-                   ('CityToCityTrip', 'CityToCityTrip'),
-                   ('AirportPickUp', 'AirportPickUp'),
-                   ('AirportDrops', 'AirportDrops'),
-                   ('WithinCitySingleTrip', 'WithinCitySingleTrip'))
-    limoServCate = models.CharField(max_length=20, choices=limoChoices)
+class Bookings(models.Model):
+    tripId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # sourceId = models.ForeignKey()
+    date = models.DateField()
+    time = models.TimeField()
+    bookedServiceId = models.ForeignKey('Service', related_name='bookedService', on_delete=models.CASCADE)
+    bookedSubServiceId = models.ForeignKey('SubServices', related_name='bookedSubServiceId', on_delete=models.CASCADE)
+    pCity = models.CharField(max_length=40)
+    pAddress = models.CharField(max_length=100)
+    pDate = models.DateField()
+    pTime = models.TimeField()
+    dCity = models.CharField(max_length=40)
+    dAddress = models.CharField(max_length=100)
+    dDate = models.DateField()
+    dTime = models.TimeField()
+    bookedUserId = models.ForeignKey('UserModel', related_name='bookedUser', on_delete=models.CASCADE)
+    bookedVehicleId = models.ForeignKey('VehicleDetails', related_name='bookedVehicleId', on_delete=models.CASCADE)
+    # bookedDriverId = models.ForeignKey('VehicleDetails', related_name='bookedVehicleId', on_delete=models.CASCADE)
+    price = models.IntegerField()
+    paymentStatus = models.BooleanField(default=False)
+    remarks = models.IntegerField()
 
     def __str__(self):
-        return self.limoServCate
+        return self.time

@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import UserModel, VehicleDetails, Trips, ForgetPassword
+from .models import UserModel, ForgetPassword, Service, SubServices, VehicleDetails, Bookings
 
 
-
+# serializer for user Model
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
@@ -13,12 +13,37 @@ class UserSerializer(serializers.ModelSerializer):
         kwargs['partial'] = True
         super(UserSerializer, self).__init__(*args, **kwargs)
 
-
+# Serializer for ForgetPasswordSerializer
 class ForgetPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = ForgetPassword
         fields = '__all__'
 
+
+# Serializer for Service Class
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = '__all__'
+    
+    # For Partial Updating
+    def __init__(self, *args, **kwargs):
+        kwargs['partial'] = True
+        super(ServiceSerializer, self).__init__(*args, **kwargs)
+
+
+# SubService Serializer Class
+class SubServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubServices
+        fields = '__all__'
+    
+    # For Partial Updating
+    def __init__(self, *args, **kwargs):
+        kwargs['partial'] = True
+        super(SubServiceSerializer, self).__init__(*args, **kwargs)
+
+# Vehicle Class Serializer
 class VehicleDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleDetails
@@ -29,12 +54,21 @@ class VehicleDetailsSerializer(serializers.ModelSerializer):
         kwargs['partial'] = True
         super(VehicleDetailsSerializer, self).__init__(*args, **kwargs)
 
-class TripsSerializer(serializers.ModelSerializer):
+
+# Booking Class Serializer
+class BookingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Trips
+        model = Bookings
         fields = '__all__'
 
-    # For partial Updating
+    # For Partial Updating
     def __init__(self, *args, **kwargs):
         kwargs['partial'] = True
-        super(TripsSerializer, self).__init__(*args, **kwargs)
+        super(BookingSerializer, self).__init__(*args, **kwargs)
+
+
+# Registration
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ('userId', 'firstName', 'lastName', 'password', 'phone', 'email', 'userImg', 'licenseNumber', 'dob', 'city')
